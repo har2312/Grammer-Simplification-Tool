@@ -1,26 +1,17 @@
-interface QuickGuideProps {
-  items: string[];
-  exampleGrammar: string;
-}
+const GUIDE_ITEMS = [
+  "One rule per line (e.g., S -> A B | b).",
+  "Type 'null' to insert the epsilon symbol (ε).",
+];
 
-export function QuickGuide({ items, exampleGrammar }: QuickGuideProps) {
+export function QuickGuide() {
   return (
-    <article className="glass-card quick-guide">
-      <div className="card-title-row">
-        <h2>Quick Guide</h2>
-        <span>Input format</span>
-      </div>
-
-      <ul className="guide-list">
-        {items.map((item) => (
+    <div className="glass-card quick-guide-card">
+      <h3>Quick Guide</h3>
+      <ul className="guide-list compact-guide-list">
+        {GUIDE_ITEMS.map((item) => (
           <li key={item}>{item}</li>
         ))}
       </ul>
-
-      <div className="grammar-preview">
-        <p>Example</p>
-        <pre>{exampleGrammar}</pre>
-      </div>
-    </article>
+    </div>
   );
 }

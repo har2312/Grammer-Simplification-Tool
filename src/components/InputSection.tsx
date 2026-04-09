@@ -70,6 +70,7 @@ export function InputSection({
       <label htmlFor="grammar-input">Productions</label>
       <textarea
         ref={textareaRef}
+        className="grammar-textarea"
         id="grammar-input"
         value={grammarInput}
         onChange={(event) =>
@@ -83,7 +84,7 @@ export function InputSection({
         rows={11}
       />
 
-      <div className="button-row">
+      <div className="button-row input-actions">
         <button className="primary" onClick={onSimplify}>
           Simplify Grammar
         </button>

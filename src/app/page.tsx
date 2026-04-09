@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { DiffTimeline } from "../components/DiffTimeline";
 import { InputSection } from "../components/InputSection";
 import { QuickGuide } from "../components/QuickGuide";
-import { TabbedTimeline, type TimelineTabKey } from "../components/TabbedTimeline";
 import { simplifyGrammar, type SimplificationResult } from "../utils/grammarEngine";
 
 const EXAMPLE_GRAMMAR = `S -> A B | b
@@ -24,19 +24,19 @@ export default function HomePage() {
   const [grammarInput, setGrammarInput] = useState(EXAMPLE_GRAMMAR);
   const [startSymbol, setStartSymbol] = useState("S");
   const [result, setResult] = useState<SimplificationResult | null>(buildInitialResult);
-  const [activeTab, setActiveTab] = useState<TimelineTabKey>("original");
+  const [activeStep, setActiveStep] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
 
   const runSimplification = () => {
     try {
       const output = simplifyGrammar(grammarInput, startSymbol);
       setResult(output);
-      setActiveTab("original");
+      setActiveStep(0);
       setErrorMessage("");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unexpected error";
       setResult(null);
-      setActiveTab("original");
+      setActiveStep(0);
       setErrorMessage(message);
     }
   };
@@ -45,19 +45,9 @@ export default function HomePage() {
     setGrammarInput("");
     setStartSymbol("S");
     setResult(null);
-    setActiveTab("original");
+    setActiveStep(0);
     setErrorMessage("");
   };
-
-  const guideItems = useMemo(
-    () => [
-      "Write one production per line.",
-      "Use S -> A B | a style notation.",
-      "Use ε for null production (or epsilon / lambda).",
-      "Click Simplify Grammar to see each transformation.",
-    ],
-    []
-  );
 
   return (
     <main className="page-shell">
@@ -83,20 +73,15 @@ export default function HomePage() {
               setGrammarInput(EXAMPLE_GRAMMAR);
               setStartSymbol("S");
               setResult(buildInitialResult());
-              setActiveTab("original");
+              setActiveStep(0);
               setErrorMessage("");
             }}
             onClear={clearAll}
           />
-          <QuickGuide items={guideItems} exampleGrammar={EXAMPLE_GRAMMAR} />
+          <QuickGuide />
         </aside>
 
         <section className="right-column">
-          <div className="timeline-header glass-card">
-            <h2>Simplification Timeline</h2>
-            <span>{result ? `Final start symbol: ${result.finalStartSymbol}` : "Run to generate steps"}</span>
-          </div>
-
           {result && result.warnings.length > 0 && (
             <div className="warning-box glass-card">
               {result.warnings.map((warning) => (
@@ -105,7 +90,7 @@ export default function HomePage() {
             </div>
           )}
 
-          <TabbedTimeline result={result} activeTab={activeTab} onTabChange={setActiveTab} />
+          <DiffTimeline result={result} activeStep={activeStep} onStepChange={setActiveStep} />
         </section>
       </section>
     </main>
