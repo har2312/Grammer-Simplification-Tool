@@ -10,26 +10,34 @@ The app simplifies a grammar in this strict order:
 2. Eliminate Null Productions
 3. Remove Unit Productions
 
-The right panel shows results using tabs:
+The right panel shows results through a timeline slider:
 
-- `Original`
-- `1. Useless`
-- `2. Null`
-- `3. Unit`
-- `Final`
+- `0: Original`
+- `1: Useless`
+- `2: Null`
+- `3: Unit`
+- `4: Final`
 
-Only one stage is shown at a time to avoid UI congestion.
+The active step updates instantly as the slider moves, and steps 1-3 include visual diffs against the previous step.
 
 ## Feature Highlights
 
 - Dark-mode glassmorphism UI optimized for readability
 - Split-screen workflow:
    - Left panel: grammar input + quick guide
-   - Right panel: tabbed simplification results
+   - Right panel: slider-based simplification and diff view
 - Auto-replace in input: typing `null` (case-insensitive) becomes `ε`
 - Cursor-aware replacement: caret position is preserved while typing
+- Added/removed rule highlighting between intermediate steps (`green` added, `red` removed)
 - Strict simplification order with per-step details and warnings
 - Handles undefined variable-like symbols as non-generating references
+
+## UI Behavior
+
+- Viewport-locked desktop layout (`100vh`/`100dvh`) to avoid global page scrolling
+- Internal scrolling only inside panel content regions
+- Left panel uses a compact always-visible Quick Guide
+- Input textarea is flex-grow and space-aware to avoid button overlap
 
 ## Tech Stack
 
@@ -42,9 +50,8 @@ Only one stage is shown at a time to avoid UI congestion.
 
 - `src/app/page.tsx` - Main page and state wiring
 - `src/components/InputSection.tsx` - Start symbol, productions input, actions
-- `src/components/QuickGuide.tsx` - Input format helper card
-- `src/components/TabbedTimeline.tsx` - Tab navigation and active result panel
-- `src/components/TimelineCard.tsx` - Step card renderer
+- `src/components/QuickGuide.tsx` - Compact always-visible input rules
+- `src/components/DiffTimeline.tsx` - Slider + diff renderer for step transitions
 - `src/components/FinalGrammarCard.tsx` - Final grammar card
 - `src/utils/grammarEngine.ts` - Parser and simplification algorithms
 - `src/app/globals.css` - Dark glassmorphism styling
