@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DiffTimeline } from "../components/DiffTimeline";
+import { DiffTimeline } from "@/components/DiffTimeline";
 import { InputSection } from "../components/InputSection";
 import { QuickGuide } from "../components/QuickGuide";
 import { simplifyGrammar, type SimplificationResult } from "../utils/grammarEngine";
