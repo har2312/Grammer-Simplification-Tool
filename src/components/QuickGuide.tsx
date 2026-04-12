@@ -1,6 +1,7 @@
 const GUIDE_ITEMS = [
   "One rule per line (e.g., S -> A B | b).",
   "Type 'null' to insert the epsilon symbol (ε).",
+  "Type a Capital + Space to insert an arrow (->).",
 ];
 
 export function QuickGuide() {

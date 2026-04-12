@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 interface InputSectionProps {
   startSymbol: string;
@@ -23,10 +23,23 @@ export function InputSection({
   onLoadExample,
   onClear,
 }: InputSectionProps) {
+  const [showHint, setShowHint] = useState(false);
+  const [hasDismissedHint, setHasDismissedHint] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const pendingSelectionRef = useRef<{ start: number; end: number } | null>(null);
 
-  const replaceNullWord = (value: string) => value.replace(/\bnull\b/gi, "ε");
+  const formatGrammarInput = (value: string) => {
+    let formatted = value.replace(/\bnull\b/gi, "ε");
+    formatted = formatted.replace(/^([A-Z]'?)[ \t]$/gm, "$1 -> ");
+
+    return formatted;
+  };
+
+  const triggerHint = () => {
+    if (!hasDismissedHint && !showHint) {
+      setShowHint(true);
+    }
+  };
 
   useLayoutEffect(() => {
     const pending = pendingSelectionRef.current;
@@ -44,9 +57,10 @@ export function InputSection({
   }, [grammarInput]);
 
   const handleGrammarChange = (rawValue: string, selectionStart: number, selectionEnd: number) => {
-    const nextValue = replaceNullWord(rawValue);
-    const nextStart = replaceNullWord(rawValue.slice(0, selectionStart)).length;
-    const nextEnd = replaceNullWord(rawValue.slice(0, selectionEnd)).length;
+    triggerHint();
+    const nextValue = formatGrammarInput(rawValue);
+    const nextStart = formatGrammarInput(rawValue.slice(0, selectionStart)).length;
+    const nextEnd = formatGrammarInput(rawValue.slice(0, selectionEnd)).length;
 
     pendingSelectionRef.current = { start: nextStart, end: nextEnd };
     onGrammarChange(nextValue);
@@ -63,7 +77,10 @@ export function InputSection({
       <input
         id="start-symbol"
         value={startSymbol}
-        onChange={(event) => onStartSymbolChange(event.target.value)}
+        onChange={(event) => {
+          triggerHint();
+          onStartSymbolChange(event.target.value);
+        }}
         placeholder="S"
       />
 
@@ -81,8 +98,23 @@ export function InputSection({
           )
         }
         placeholder="S -> A B | b"
-        rows={11}
+        rows={5}
       />
+
+      {showHint && (
+        <div className="floating-typing-hint glass-card">
+          <p>💡 Magic Typing: Type &apos;null&apos; for ε, and press Space after a Capital letter for an arrow!</p>
+          <button
+            className="primary"
+            onClick={() => {
+              setShowHint(false);
+              setHasDismissedHint(true);
+            }}
+          >
+            Got it!
+          </button>
+        </div>
+      )}
 
       <div className="button-row input-actions">
         <button className="primary" onClick={onSimplify}>

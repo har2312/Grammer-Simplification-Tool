@@ -4,7 +4,7 @@ import { FinalGrammarCard } from "./FinalGrammarCard";
 import { TimelineCard } from "./TimelineCard";
 import type { SimplificationResult } from "../utils/grammarEngine";
 
-export type TimelineTabKey = "original" | "useless" | "null" | "unit" | "final";
+export type TimelineTabKey = "original" | "null" | "unit" | "useless" | "final";
 
 interface TabbedTimelineProps {
   result: SimplificationResult | null;
@@ -14,18 +14,18 @@ interface TabbedTimelineProps {
 
 const TAB_DEFS: Array<{ key: TimelineTabKey; label: string }> = [
   { key: "original", label: "Original" },
-  { key: "useless", label: "1. Useless" },
-  { key: "null", label: "2. Null" },
-  { key: "unit", label: "3. Unit" },
+  { key: "null", label: "1. Null" },
+  { key: "unit", label: "2. Unit" },
+  { key: "useless", label: "3. Useless" },
   { key: "final", label: "Final" },
 ];
 
 export function TabbedTimeline({ result, activeTab, onTabChange }: TabbedTimelineProps) {
   const stepIndexByTab: Record<Exclude<TimelineTabKey, "final">, number> = {
     original: 0,
-    useless: 1,
-    null: 2,
-    unit: 3,
+    null: 1,
+    unit: 2,
+    useless: 3,
   };
 
   const renderContent = () => {

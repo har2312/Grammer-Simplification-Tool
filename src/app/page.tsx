@@ -24,19 +24,16 @@ export default function HomePage() {
   const [grammarInput, setGrammarInput] = useState(EXAMPLE_GRAMMAR);
   const [startSymbol, setStartSymbol] = useState("S");
   const [result, setResult] = useState<SimplificationResult | null>(buildInitialResult);
-  const [activeStep, setActiveStep] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
 
   const runSimplification = () => {
     try {
       const output = simplifyGrammar(grammarInput, startSymbol);
       setResult(output);
-      setActiveStep(0);
       setErrorMessage("");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unexpected error";
       setResult(null);
-      setActiveStep(0);
       setErrorMessage(message);
     }
   };
@@ -45,23 +42,22 @@ export default function HomePage() {
     setGrammarInput("");
     setStartSymbol("S");
     setResult(null);
-    setActiveStep(0);
     setErrorMessage("");
   };
 
   return (
     <main className="page-shell">
       <header className="page-header">
-        <p className="eyebrow">Compiler Design Lab</p>
         <h1>Grammar Simplification Tool</h1>
         <p>
           Deep-visual CFG simplification with mathematically ordered transformations:
-          useless symbols, null productions, and unit productions.
+          null productions, unit productions, and useless symbols.
         </p>
       </header>
 
       <section className="workspace-grid">
         <aside className="left-column">
+          <QuickGuide />
           <InputSection
             startSymbol={startSymbol}
             grammarInput={grammarInput}
@@ -73,12 +69,10 @@ export default function HomePage() {
               setGrammarInput(EXAMPLE_GRAMMAR);
               setStartSymbol("S");
               setResult(buildInitialResult());
-              setActiveStep(0);
               setErrorMessage("");
             }}
             onClear={clearAll}
           />
-          <QuickGuide />
         </aside>
 
         <section className="right-column">
@@ -90,7 +84,7 @@ export default function HomePage() {
             </div>
           )}
 
-          <DiffTimeline result={result} activeStep={activeStep} onStepChange={setActiveStep} />
+          <DiffTimeline result={result} />
         </section>
       </section>
     </main>

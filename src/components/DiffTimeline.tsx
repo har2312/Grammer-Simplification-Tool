@@ -5,8 +5,6 @@ import type { SimplificationResult, SimplificationStep } from "../utils/grammarE
 
 interface DiffTimelineProps {
   result: SimplificationResult | null;
-  activeStep: number;
-  onStepChange: (step: number) => void;
 }
 
 type DiffStatus = "unchanged" | "added" | "removed";
@@ -15,8 +13,6 @@ interface DiffEntry {
   rule: string;
   status: DiffStatus;
 }
-
-const STEP_LABELS = ["Original", "1. Useless", "2. Null", "3. Unit", "Final"] as const;
 
 function parseRules(grammarText: string): string[] {
   return grammarText
@@ -66,17 +62,23 @@ function StepDetails({ step, previousStep }: { step: SimplificationStep; previou
       </div>
 
       {shouldShowDiff ? (
-        <div className="grammar-box diff-grammar-box">
-          {diffEntries.map((entry, index) => (
-            <div
-              key={`${entry.status}-${entry.rule}-${index}`}
-              className={`rule-line ${entry.status === "added" ? "added-rule" : ""} ${
-                entry.status === "removed" ? "removed-rule" : ""
-              }`}
-            >
-              {entry.rule}
-            </div>
-          ))}
+        <div className="grammar-box grammar-comparison">
+          <div className="comparison-lhs diff-grammar-box">
+            {diffEntries.map((entry, index) => (
+              <div
+                key={`${entry.status}-${entry.rule}-${index}`}
+                className={`rule-line ${entry.status === "added" ? "added-rule" : ""} ${
+                  entry.status === "removed" ? "removed-rule" : ""
+                }`}
+              >
+                {entry.rule}
+              </div>
+            ))}
+          </div>
+
+          <div className="comparison-arrow" aria-hidden="true" />
+
+          <pre className="comparison-rhs">{step.grammarText}</pre>
         </div>
       ) : (
         <pre className="grammar-box">{step.grammarText}</pre>
@@ -93,68 +95,38 @@ function StepDetails({ step, previousStep }: { step: SimplificationStep; previou
   );
 }
 
-export function DiffTimeline({ result, activeStep, onStepChange }: DiffTimelineProps) {
-  const clampedStep = Math.max(0, Math.min(4, activeStep));
+export function DiffTimeline({ result }: DiffTimelineProps) {
   const finalStartText = result ? `Final start symbol: ${result.finalStartSymbol}` : "Final start symbol: -";
-
-  const renderPanelContent = () => {
-    if (!result) {
-      return (
-        <article className="glass-card empty-card">
-          <h3>No steps yet</h3>
-          <p>Enter productions and click Simplify Grammar.</p>
-        </article>
-      );
-    }
-
-    if (clampedStep === 4) {
-      return (
-        <FinalGrammarCard
-          finalStartSymbol={result.finalStartSymbol}
-          finalGrammar={result.finalGrammar}
-        />
-      );
-    }
-
-    const currentStep = result.steps[clampedStep];
-    const previousStep = clampedStep > 0 ? result.steps[clampedStep - 1] : undefined;
-
-    return <StepDetails step={currentStep} previousStep={previousStep} />;
-  };
 
   return (
     <section className="glass-card diff-timeline">
-      <div className="slider-wrap">
-        <div className="slider-topline">
-          <h3>Step Slider</h3>
-          <span>{finalStartText}</span>
-        </div>
-
-        <input
-          className="timeline-slider"
-          type="range"
-          min={0}
-          max={4}
-          step={1}
-          value={clampedStep}
-          onChange={(event) => onStepChange(Number(event.target.value))}
-        />
-
-        <div className="slider-current-step">Active: {STEP_LABELS[clampedStep]}</div>
-
-        <div className="slider-labels">
-          {STEP_LABELS.map((label, index) => (
-            <span
-              key={label}
-              className={`slider-label ${clampedStep === index ? "active" : ""}`}
-            >
-              {label}
-            </span>
-          ))}
-        </div>
+      <div className="timeline-header">
+        <h3>Study Feed</h3>
+        <span>{finalStartText}</span>
       </div>
 
-      <div className="timeline-step-panel">{renderPanelContent()}</div>
+      <div className="timeline-step-panel">
+        {!result ? (
+          <article className="glass-card empty-card">
+            <h3>No steps yet</h3>
+            <p>Enter productions and click Simplify Grammar.</p>
+          </article>
+        ) : (
+          <>
+            {result.steps.map((step, index) => (
+              <StepDetails
+                key={step.id}
+                step={step}
+                previousStep={index > 0 ? result.steps[index - 1] : undefined}
+              />
+            ))}
+            <FinalGrammarCard
+              finalStartSymbol={result.finalStartSymbol}
+              finalGrammar={result.finalGrammar}
+            />
+          </>
+        )}
+      </div>
     </section>
   );
 }

@@ -17,7 +17,7 @@ const monoFont = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Grammar Simplification Tool",
   description:
-    "Interactive visualizer for simplifying context-free grammars: useless symbol removal, null production elimination, and unit production elimination.",
+    "Interactive visualizer for simplifying context-free grammars: null production elimination, unit production elimination, and useless symbol removal.",
 };
 
 export default function RootLayout({

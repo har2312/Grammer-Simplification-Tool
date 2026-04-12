@@ -6,16 +6,16 @@ Interactive Next.js app for visualizing Context-Free Grammar (CFG) simplificatio
 
 The app simplifies a grammar in this strict order:
 
-1. Remove Useless Symbols
-2. Eliminate Null Productions
-3. Remove Unit Productions
+1. Eliminate Null Productions
+2. Remove Unit Productions
+3. Remove Useless Symbols
 
 The right panel shows results through a timeline slider:
 
 - `0: Original`
-- `1: Useless`
-- `2: Null`
-- `3: Unit`
+- `1: Null`
+- `2: Unit`
+- `3: Useless`
 - `4: Final`
 
 The active step updates instantly as the slider moves, and steps 1-3 include visual diffs against the previous step.
@@ -135,23 +135,23 @@ Notes:
 
 ## Algorithm Notes
 
-### 1) Remove Useless Symbols
-
-- Phase A: find generating variables via fixed-point iteration
-- Phase B: find reachable variables from start symbol
-- Rules containing undefined variable-like symbols (for example `B -> C` where `C` is never defined on LHS) are treated as non-generating and removed
-
-### 2) Eliminate Null Productions
+### 1) Eliminate Null Productions
 
 - Compute nullable variables
 - If start symbol is nullable, introduce a fresh start symbol `S'`
 - Expand nullable combinations and remove explicit null rules
 
-### 3) Remove Unit Productions
+### 2) Remove Unit Productions
 
 - Build unit graph
 - Compute full unit-closure pairs
 - Replace unit chains with non-unit productions
+
+### 3) Remove Useless Symbols
+
+- Phase A: find generating variables via fixed-point iteration
+- Phase B: find reachable variables from start symbol
+- Rules containing undefined variable-like symbols (for example `B -> C` where `C` is never defined on LHS) are treated as non-generating and removed
 
 ## Deploy on Vercel
 

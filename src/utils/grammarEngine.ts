@@ -116,7 +116,7 @@ function tokenizeAlternative(rawAlternative: string): Alternative {
     return raw.split(/\s+/).filter(Boolean);
   }
 
-  const compactTokens = raw.match(/[A-Z][a-z0-9_']*|[a-z][a-z0-9_']*|[0-9]+|[^A-Za-z0-9_\s]/g);
+  const compactTokens = raw.match(/[A-Z]'*|[a-z0-9]|[^A-Za-z0-9\s]/g);
 
   if (!compactTokens) {
     return [raw];
@@ -558,32 +558,32 @@ export function simplifyGrammar(input: string, startSymbol: string): Simplificat
     title: "Step 0: Original Grammar",
     description: "Initial CFG as parsed from input.",
     grammarText: grammarToText(parsed.grammar),
-    details: [`Start symbol: ${parsed.grammar.startSymbol}`],
+    details: ["Start symbol: " + parsed.grammar.startSymbol],
   };
 
-  const step1Result = removeUselessSymbols(parsed.grammar);
+  const step1Result = eliminateNullProductions(parsed.grammar);
   const step1: SimplificationStep = {
     id: 1,
-    title: "Step 1: Remove Useless Symbols",
-    description: "Phase A (generating) then Phase B (reachable).",
+    title: "Step 1: Eliminate Null Productions",
+    description: "Nullable variables expanded and explicit epsilon rules removed.",
     grammarText: grammarToText(step1Result.grammar),
     details: step1Result.details,
   };
 
-  const step2Result = eliminateNullProductions(step1Result.grammar);
+  const step2Result = removeUnitProductions(step1Result.grammar);
   const step2: SimplificationStep = {
     id: 2,
-    title: "Step 2: Eliminate Null Productions",
-    description: "Nullable variables expanded and explicit epsilon rules removed.",
+    title: "Step 2: Remove Unit Productions",
+    description: "Unit-closure substitution removes all unit rules.",
     grammarText: grammarToText(step2Result.grammar),
     details: step2Result.details,
   };
 
-  const step3Result = removeUnitProductions(step2Result.grammar);
+  const step3Result = removeUselessSymbols(step2Result.grammar);
   const step3: SimplificationStep = {
     id: 3,
-    title: "Step 3: Remove Unit Productions",
-    description: "Unit-closure substitution produces the final simplified CFG.",
+    title: "Step 3: Remove Useless Symbols",
+    description: "Phase A (generating) then Phase B (reachable).",
     grammarText: grammarToText(step3Result.grammar),
     details: step3Result.details,
   };
